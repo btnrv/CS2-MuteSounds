@@ -1,0 +1,21 @@
+{
+    "Prefix": "{darkred}[MuteSounds]{white} ",
+    "SoundsCommandDescription": "Opens sound muting menu.",
+    "MainMenuTitle": "Game Sound Menu",
+    "KnifeSoundsMenu": "Knife Sounds",
+    "FootstepSoundsMenu": "Footstep Sounds",
+    "GunSoundsMenu": "Gun Sounds",
+    "UnmuteKnifeSounds": "Unmute Knife Sounds",
+    "MuteKnifeSounds": "Mute Knife Sounds",
+    "KnifeSoundsUnmuted": "Knife sounds {green}successfully{white} unmuted.",
+    "KnifeSoundsMuted": "Knife sounds {red}successfully{white} muted.",
+    "UnmuteFootstepSounds": "Unmute Footstep Sounds",
+    "MuteFootstepSounds": "Mute Footstep Sounds",
+    "FootstepSoundsUnmuted": "Walking sounds {green}successfully{white} unmuted.",
+    "FootstepSoundsMuted": "Walking sounds {red}successfully{white} muted.",
+    "UnmuteGunSounds": "Unmute Gun Sounds",
+    "MuteGunSounds": "Mute Gun Sounds",
+    "GunSoundsUnmuted": "Gun sounds {green}successfully{white} unmuted.",
+    "GunSoundsMuted": "Gun sounds {red}successfully{white} muted.",
+    "PlayerCountWithThisFilter": "<br>Players with this filter: {0}"
+}

@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p release
           cd bin/Release/net8.0
-          zip -r ../../../MuteSounds-v${{ env.BUILD_NUMBER }}.zip * --exclude '*.pdb'
+          zip -r ../../../MuteSounds.zip * --exclude '*.pdb'
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1

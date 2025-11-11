@@ -17,5 +17,10 @@
     "MuteGunSounds": "Silah Seslerini Kapat",
     "GunSoundsUnmuted": "Silah sesleri başarıyla {green}açıldı{white}.",
     "GunSoundsMuted": "Silah sesleri başarıyla {red}kapatıldı{white}.",
+    "MVPMusicMenu": "MVP Müziği",
+    "UnmuteMVPMusic": "MVP Müziğini Aç",
+    "MuteMVPMusic": "MVP Müziğini Kapat",
+    "MVPMusicUnmuted": "MVP müziği {green}başarıyla{white} açıldı.",
+    "MVPMusicMuted": "MVP müziği {red}başarıyla{white} kapatıldı.",
     "PlayerCountWithThisFilter": "<br>Bu filtre ile oynayanlar: {0}"
 }

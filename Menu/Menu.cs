@@ -37,6 +37,12 @@ public partial class MuteSounds
             gunMenu?.Display(player, -1);
         });
 
+        menu.AddItem(Localizer["MVPMusicMenu"], (player, info) =>
+        {
+            var mvpMenu = CreateMVPMusicMenu(player);
+            mvpMenu?.Display(player, -1);
+        });
+
         return menu;
     }
 
@@ -123,6 +129,35 @@ public partial class MuteSounds
         }
 
         menu.AddItem(Localizer["PlayerCountWithThisFilter", GunSoundMuters.Count], DisableOption.DisableHideNumber);
+
+        return menu;
+    }
+
+    public BaseMenu? CreateMVPMusicMenu(CCSPlayerController player)
+    {
+        if (player == null || !player.IsValid) return null;
+
+        var menu = CreateMenu(Localizer["MVPMusicMenu"]);
+        if (MVPMusicMuters.Contains(player))
+        {
+            menu.AddItem(Localizer["UnmuteMVPMusic"], (player, info) =>
+            {
+                MVPMusicMuters.Remove(player);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["MVPMusicUnmuted"]);
+                MenuManager.CloseActiveMenu(player);
+            });
+        }
+        else
+        {
+            menu.AddItem(Localizer["MuteMVPMusic"], (player, info) =>
+            {
+                MVPMusicMuters.Add(player);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["MVPMusicMuted"]);
+                MenuManager.CloseActiveMenu(player);
+            });
+        }
+
+        menu.AddItem(Localizer["PlayerCountWithThisFilter", MVPMusicMuters.Count], DisableOption.DisableHideNumber);
 
         return menu;
     }

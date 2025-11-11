@@ -17,5 +17,10 @@
     "MuteGunSounds": "Mute Gun Sounds",
     "GunSoundsUnmuted": "Gun sounds {green}successfully{white} unmuted.",
     "GunSoundsMuted": "Gun sounds {red}successfully{white} muted.",
+    "MVPMusicMenu": "MVP Music",
+    "UnmuteMVPMusic": "Unmute MVP Music",
+    "MuteMVPMusic": "Mute MVP Music",
+    "MVPMusicUnmuted": "MVP music {green}successfully{white} unmuted.",
+    "MVPMusicMuted": "MVP music {red}successfully{white} muted.",
     "PlayerCountWithThisFilter": "<br>Players with this filter: {0}"
 }

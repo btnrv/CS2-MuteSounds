@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Utils;
 
 namespace MuteSounds;
 
@@ -8,6 +9,7 @@ public partial class MuteSounds
     public List<CCSPlayerController> KnifeSoundMuters = new();
     public List<CCSPlayerController> FootstepSoundMuters = new();
     public List<CCSPlayerController> GunSoundMuters = new();
+    public List<CCSPlayerController> MVPMusicMuters = new();
     
     public void HookMuteSounds()
     {
@@ -78,6 +80,46 @@ public partial class MuteSounds
             return HookResult.Continue;
 
         }, HookMode.Pre);
+        
+        RegisterEventHandler<EventRoundMvp>(OnEventRoundMvp);
+    }
+
+    public HookResult OnEventRoundMvp(EventRoundMvp @event, GameEventInfo info)
+    {
+        if (@event == null) return HookResult.Continue;
+
+        var player = @event.Userid;
+        if (player == null || !player.IsValid) return HookResult.Continue;
+
+        // If there are players who want to mute MVP music, emit stop sound to them
+        if (MVPMusicMuters.Count > 0)
+        {
+            EmitSoundToPlayers("StopSoundEvents.StopAllMusic", MVPMusicMuters);
+        }
+
+        return HookResult.Continue;
+    }
+
+    public void EmitSoundToPlayers(string soundEventName, List<CCSPlayerController> recipients)
+    {
+        if (string.IsNullOrEmpty(soundEventName) || recipients == null || recipients.Count == 0) return;
+
+        var worldEntity = Utilities.GetEntityFromIndex<CBaseEntity>(0);
+        if (worldEntity == null || !worldEntity.IsValid || !worldEntity.DesignerName.Contains("world")) return;
+
+        // Clean up invalid players and emit sound to each valid recipient
+        foreach (var player in recipients.ToList())
+        {
+            if (player == null || !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
+            {
+                if (player != null)
+                    MVPMusicMuters.Remove(player);
+                continue;
+            }
+
+            var recipientFilter = new RecipientFilter(player);
+            worldEntity.EmitSound(soundEventName, recipientFilter);
+        }
     }
 }
 

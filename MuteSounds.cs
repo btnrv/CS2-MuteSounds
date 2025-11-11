@@ -24,3 +24,4 @@ public partial class MuteSounds : BasePlugin, IPluginConfig<MuteSoundsConfig>
         RegisterCommands();
     }
 }
+  

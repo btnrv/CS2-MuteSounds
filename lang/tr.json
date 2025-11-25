@@ -23,7 +23,7 @@
     "MVPMusicUnmuted": "MVP müziği {green}başarıyla{white} açıldı.",
     "MVPMusicMuted": "MVP müziği {red}başarıyla{white} kapatıldı.",
     "PlayerCountWithThisFilter": "Bu filtre ile oynayanlar: {0}",
-    "CurrentTarget": "Mevcut Hedef: {0}",
+    "CurrentTarget": "<font color='#ADADAD'>Mevcut Hedef: {0}</font>",
     "TargetEveryone": "Herkes",
     "TargetTeam": "Takım Arkadaşları",
     "TargetEnemy": "Düşmanlar"

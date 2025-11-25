@@ -23,7 +23,7 @@
     "MVPMusicUnmuted": "MVP music {green}successfully{white} unmuted.",
     "MVPMusicMuted": "MVP music {red}successfully{white} muted.",
     "PlayerCountWithThisFilter": "Players with this filter: {0}",
-    "CurrentTarget": "Current Target: {0}",
+    "CurrentTarget": "<font color='#ADADAD'>Current Target: {0}</font>",
     "TargetEveryone": "Everyone",
     "TargetTeam": "Teammates",
     "TargetEnemy": "Enemies"

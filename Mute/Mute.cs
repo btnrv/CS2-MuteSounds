@@ -10,7 +10,7 @@ public partial class MuteSounds
     public List<CCSPlayerController> FootstepSoundMuters = new();
     public List<CCSPlayerController> GunSoundMuters = new();
     public List<CCSPlayerController> MVPMusicMuters = new();
-    
+
     public void HookMuteSounds()
     {
         HookUserMessage(208, um =>
@@ -38,7 +38,8 @@ public partial class MuteSounds
                             FootstepSoundMuters.Remove(p);
                         continue;
                     }
-                    um.Recipients.Remove(p);
+                    if (entity?.TeamNum == null || entity.TeamNum == p.TeamNum)
+                        um.Recipients.Remove(p);
                 }
                 return HookResult.Continue;
             }
@@ -53,7 +54,8 @@ public partial class MuteSounds
                             KnifeSoundMuters.Remove(p);
                         continue;
                     }
-                    um.Recipients.Remove(p);
+                    if (entity?.TeamNum == null || entity.TeamNum == p.TeamNum)
+                        um.Recipients.Remove(p);
                 }
                 return HookResult.Continue;
             }
@@ -64,6 +66,9 @@ public partial class MuteSounds
         // Gun sounds
         HookUserMessage(452, um =>
         {
+            var entityIndex = um.ReadInt("source_entity_index");
+            var entity = Utilities.GetEntityFromIndex<CBaseEntity>(entityIndex);
+
             if (um.Recipients == null || um.Recipients.Count == 0)
                 return HookResult.Continue;
 
@@ -75,12 +80,13 @@ public partial class MuteSounds
                         GunSoundMuters.Remove(p);
                     continue;
                 }
-                um.Recipients.Remove(p);
+                if (entity?.TeamNum == null || entity.TeamNum == p.TeamNum)
+                    um.Recipients.Remove(p);
             }
             return HookResult.Continue;
 
         }, HookMode.Pre);
-        
+
         RegisterEventHandler<EventRoundMvp>(OnEventRoundMvp);
     }
 

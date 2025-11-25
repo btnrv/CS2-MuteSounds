@@ -2,6 +2,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Modules.Utils;
 using System.Runtime.InteropServices;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace MuteSounds;
 
@@ -40,7 +41,9 @@ public partial class MuteSounds
     }
     public bool ShouldMuteSound(CCSPlayerController listener, CBaseEntity? soundSource, MuteTarget target)
     {
-        if (soundSource?.TeamNum == null) return true;
+        // If we can't determine teams, don't mute (except for Everyone)
+        if (soundSource?.TeamNum == null || listener?.TeamNum == null)
+            return target == MuteTarget.Everyone;
         
         switch (target)
         {
@@ -122,11 +125,14 @@ public partial class MuteSounds
         // Gun sounds
         HookUserMessage(452, um =>
         {
+            if (um.Recipients == null || um.Recipients.Count == 0)
+                return HookResult.Continue;
+
             uint entityHandle = um.ReadUInt("player");
             uint pawnIndex = entityHandle & (Utilities.MaxEdicts - 1);
-            var player = Utilities.GetPlayers().FirstOrDefault(x => x.PlayerPawn.Value?.Index == pawnIndex);
+            var player = Utilities.GetEntityFromIndex<CCSPlayerController>((int)pawnIndex);
 
-            if (um.Recipients == null || um.Recipients.Count == 0)
+            if (player == null)
                 return HookResult.Continue;
 
             foreach (var kvp in PlayerMutePreferences.ToList())
@@ -143,29 +149,8 @@ public partial class MuteSounds
                     continue;
                 
                 var target = kvp.Value[MuteType.GunSounds];
-                // For gun sounds, we need to check the player's pawn as the entity
-                if (player?.TeamNum == null)
-                {
-                    if (target == MuteTarget.Everyone)
-                        um.Recipients.Remove(p);
-                }
-                else
-                {
-                    switch (target)
-                    {
-                        case MuteTarget.Everyone:
-                            um.Recipients.Remove(p);
-                            break;
-                        case MuteTarget.Team:
-                            if (player.TeamNum == p.TeamNum)
-                                um.Recipients.Remove(p);
-                            break;
-                        case MuteTarget.Enemy:
-                            if (player.TeamNum != p.TeamNum)
-                                um.Recipients.Remove(p);
-                            break;
-                    }
-                }
+                if (ShouldMuteSound(p, player, target))
+                    um.Recipients.Remove(p);
             }
             return HookResult.Continue;
 

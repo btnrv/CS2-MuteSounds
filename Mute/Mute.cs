@@ -166,7 +166,6 @@ public partial class MuteSounds
         var player = @event.Userid;
         if (player == null || !player.IsValid) return HookResult.Continue;
 
-        // If there are players who want to mute MVP music, emit stop sound to them
         if (MVPMusicMuters.Count > 0)
         {
             EmitSoundToPlayers("StopSoundEvents.StopAllMusic", MVPMusicMuters);

@@ -130,7 +130,7 @@ public partial class MuteSounds
 
             uint entityHandle = um.ReadUInt("player");
             uint pawnIndex = entityHandle & (Utilities.MaxEdicts - 1);
-            var player = Utilities.GetEntityFromIndex<CCSPlayerController>((int)pawnIndex);
+            var player = Utilities.GetPlayers().FirstOrDefault(x => x.PlayerPawn.Value?.Index == pawnIndex);
 
             if (player == null)
                 return HookResult.Continue;

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MuteSounds")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21eb9368fe05e376751c61e1733fb560d5e69e1b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+03298192fb3431bd4cc0c4c7b835c840d597a1c3")]
 [assembly: System.Reflection.AssemblyProductAttribute("MuteSounds")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MuteSounds")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

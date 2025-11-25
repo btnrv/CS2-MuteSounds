@@ -51,26 +51,57 @@ public partial class MuteSounds
         if (player == null || !player.IsValid) return null;
 
         var menu = CreateMenu(Localizer["KnifeSoundsMenu"]);
-        if (KnifeSoundMuters.Contains(player))
+        menu.PrevMenu = CreateMainMenu(player);
+        
+        var currentTarget = GetMuteTarget(player, MuteType.PlayerSounds);
+        if (currentTarget.HasValue)
         {
-            menu.AddItem(Localizer["UnmuteKnifeSounds"], (player, info) =>
+            var item = menu.AddItem(Localizer["UnmuteKnifeSounds"], (player, info) =>
             {
-                KnifeSoundMuters.Remove(player);
+                RemoveMutePreference(player, MuteType.PlayerSounds);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["KnifeSoundsUnmuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            item.PostSelectAction = PostSelectAction.Nothing;
+            
+            var targetName = currentTarget.Value switch
+            {
+                MuteTarget.Everyone => Localizer["TargetEveryone"],
+                MuteTarget.Team => Localizer["TargetTeam"],
+                MuteTarget.Enemy => Localizer["TargetEnemy"],
+                _ => currentTarget.Value.ToString()
+            };
+            menu.AddItem(Localizer["CurrentTarget", targetName], DisableOption.DisableHideNumber);
         }
         else
         {
-            menu.AddItem(Localizer["MuteKnifeSounds"], (player, info) =>
+            var everyoneItem = menu.AddItem(Localizer["TargetEveryone"], (player, info) =>
             {
-                KnifeSoundMuters.Add(player);
+                SetMutePreference(player, MuteType.PlayerSounds, MuteTarget.Everyone);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["KnifeSoundsMuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            everyoneItem.PostSelectAction = PostSelectAction.Nothing;
+            
+            var teamItem = menu.AddItem(Localizer["TargetTeam"], (player, info) =>
+            {
+                SetMutePreference(player, MuteType.PlayerSounds, MuteTarget.Team);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["KnifeSoundsMuted"]);
+                CreateMainMenu(player)?.Display(player, -1);
+            });
+            teamItem.PostSelectAction = PostSelectAction.Nothing;
+            
+            var enemyItem = menu.AddItem(Localizer["TargetEnemy"], (player, info) =>
+            {
+                SetMutePreference(player, MuteType.PlayerSounds, MuteTarget.Enemy);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["KnifeSoundsMuted"]);
+                CreateMainMenu(player)?.Display(player, -1);
+            });
+            enemyItem.PostSelectAction = PostSelectAction.Nothing;
         }
 
-        menu.AddItem(Localizer["PlayerCountWithThisFilter", KnifeSoundMuters.Count], DisableOption.DisableHideNumber);
+        var playerCount = PlayerMutePreferences.Count(kvp => kvp.Value.ContainsKey(MuteType.PlayerSounds));
+        menu.AddItem(Localizer["PlayerCountWithThisFilter", playerCount], DisableOption.DisableHideNumber);
 
         return menu;
     }
@@ -80,26 +111,57 @@ public partial class MuteSounds
         if (player == null || !player.IsValid) return null;
 
         var menu = CreateMenu(Localizer["FootstepSoundsMenu"]);
-        if (FootstepSoundMuters.Contains(player))
+        menu.PrevMenu = CreateMainMenu(player);
+        
+        var currentTarget = GetMuteTarget(player, MuteType.Footsteps);
+        if (currentTarget.HasValue)
         {
-            menu.AddItem(Localizer["UnmuteFootstepSounds"], (player, info) =>
+            var item = menu.AddItem(Localizer["UnmuteFootstepSounds"], (player, info) =>
             {
-                FootstepSoundMuters.Remove(player);
+                RemoveMutePreference(player, MuteType.Footsteps);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["FootstepSoundsUnmuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            item.PostSelectAction = PostSelectAction.Nothing;
+            
+            var targetName = currentTarget.Value switch
+            {
+                MuteTarget.Everyone => Localizer["TargetEveryone"],
+                MuteTarget.Team => Localizer["TargetTeam"],
+                MuteTarget.Enemy => Localizer["TargetEnemy"],
+                _ => currentTarget.Value.ToString()
+            };
+            menu.AddItem(Localizer["CurrentTarget", targetName], DisableOption.DisableHideNumber);
         }
         else
         {
-            menu.AddItem(Localizer["MuteFootstepSounds"], (player, info) =>
+            var everyoneItem = menu.AddItem(Localizer["TargetEveryone"], (player, info) =>
             {
-                FootstepSoundMuters.Add(player);
+                SetMutePreference(player, MuteType.Footsteps, MuteTarget.Everyone);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["FootstepSoundsMuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            everyoneItem.PostSelectAction = PostSelectAction.Nothing;
+            
+            var teamItem = menu.AddItem(Localizer["TargetTeam"], (player, info) =>
+            {
+                SetMutePreference(player, MuteType.Footsteps, MuteTarget.Team);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["FootstepSoundsMuted"]);
+                CreateMainMenu(player)?.Display(player, -1);
+            });
+            teamItem.PostSelectAction = PostSelectAction.Nothing;
+            
+            var enemyItem = menu.AddItem(Localizer["TargetEnemy"], (player, info) =>
+            {
+                SetMutePreference(player, MuteType.Footsteps, MuteTarget.Enemy);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["FootstepSoundsMuted"]);
+                CreateMainMenu(player)?.Display(player, -1);
+            });
+            enemyItem.PostSelectAction = PostSelectAction.Nothing;
         }
 
-        menu.AddItem(Localizer["PlayerCountWithThisFilter", FootstepSoundMuters.Count], DisableOption.DisableHideNumber);
+        var playerCount = PlayerMutePreferences.Count(kvp => kvp.Value.ContainsKey(MuteType.Footsteps));
+        menu.AddItem(Localizer["PlayerCountWithThisFilter", playerCount], DisableOption.DisableHideNumber);
 
         return menu;
     }
@@ -109,26 +171,57 @@ public partial class MuteSounds
         if (player == null || !player.IsValid) return null;
 
         var menu = CreateMenu(Localizer["GunSoundsMenu"]);
-        if (GunSoundMuters.Contains(player))
+        menu.PrevMenu = CreateMainMenu(player);
+        
+        var currentTarget = GetMuteTarget(player, MuteType.GunSounds);
+        if (currentTarget.HasValue)
         {
-            menu.AddItem(Localizer["UnmuteGunSounds"], (player, info) =>
+            var item = menu.AddItem(Localizer["UnmuteGunSounds"], (player, info) =>
             {
-                GunSoundMuters.Remove(player);
+                RemoveMutePreference(player, MuteType.GunSounds);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["GunSoundsUnmuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            item.PostSelectAction = PostSelectAction.Nothing;
+            
+            var targetName = currentTarget.Value switch
+            {
+                MuteTarget.Everyone => Localizer["TargetEveryone"],
+                MuteTarget.Team => Localizer["TargetTeam"],
+                MuteTarget.Enemy => Localizer["TargetEnemy"],
+                _ => currentTarget.Value.ToString()
+            };
+            menu.AddItem(Localizer["CurrentTarget", targetName], DisableOption.DisableHideNumber);
         }
         else
         {
-            menu.AddItem(Localizer["MuteGunSounds"], (player, info) =>
+            var everyoneItem = menu.AddItem(Localizer["TargetEveryone"], (player, info) =>
             {
-                GunSoundMuters.Add(player);
+                SetMutePreference(player, MuteType.GunSounds, MuteTarget.Everyone);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["GunSoundsMuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            everyoneItem.PostSelectAction = PostSelectAction.Nothing;
+            
+            var teamItem = menu.AddItem(Localizer["TargetTeam"], (player, info) =>
+            {
+                SetMutePreference(player, MuteType.GunSounds, MuteTarget.Team);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["GunSoundsMuted"]);
+                CreateMainMenu(player)?.Display(player, -1);
+            });
+            teamItem.PostSelectAction = PostSelectAction.Nothing;
+            
+            var enemyItem = menu.AddItem(Localizer["TargetEnemy"], (player, info) =>
+            {
+                SetMutePreference(player, MuteType.GunSounds, MuteTarget.Enemy);
+                player.PrintToChat(Localizer["Prefix"] + Localizer["GunSoundsMuted"]);
+                CreateMainMenu(player)?.Display(player, -1);
+            });
+            enemyItem.PostSelectAction = PostSelectAction.Nothing;
         }
 
-        menu.AddItem(Localizer["PlayerCountWithThisFilter", GunSoundMuters.Count], DisableOption.DisableHideNumber);
+        var playerCount = PlayerMutePreferences.Count(kvp => kvp.Value.ContainsKey(MuteType.GunSounds));
+        menu.AddItem(Localizer["PlayerCountWithThisFilter", playerCount], DisableOption.DisableHideNumber);
 
         return menu;
     }
@@ -138,23 +231,26 @@ public partial class MuteSounds
         if (player == null || !player.IsValid) return null;
 
         var menu = CreateMenu(Localizer["MVPMusicMenu"]);
+        menu.PrevMenu = CreateMainMenu(player);
         if (MVPMusicMuters.Contains(player))
         {
-            menu.AddItem(Localizer["UnmuteMVPMusic"], (player, info) =>
+            var item = menu.AddItem(Localizer["UnmuteMVPMusic"], (player, info) =>
             {
                 MVPMusicMuters.Remove(player);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["MVPMusicUnmuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            item.PostSelectAction = PostSelectAction.Nothing;
         }
         else
         {
-            menu.AddItem(Localizer["MuteMVPMusic"], (player, info) =>
+            var item = menu.AddItem(Localizer["MuteMVPMusic"], (player, info) =>
             {
                 MVPMusicMuters.Add(player);
                 player.PrintToChat(Localizer["Prefix"] + Localizer["MVPMusicMuted"]);
-                MenuManager.CloseActiveMenu(player);
+                CreateMainMenu(player)?.Display(player, -1);
             });
+            item.PostSelectAction = PostSelectAction.Nothing;
         }
 
         menu.AddItem(Localizer["PlayerCountWithThisFilter", MVPMusicMuters.Count], DisableOption.DisableHideNumber);

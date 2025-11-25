@@ -1,16 +1,63 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Modules.Utils;
+using System.Runtime.InteropServices;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace MuteSounds;
 
 public partial class MuteSounds
 {
-    public List<CCSPlayerController> KnifeSoundMuters = new();
-    public List<CCSPlayerController> FootstepSoundMuters = new();
-    public List<CCSPlayerController> GunSoundMuters = new();
+    // Dictionary to store player mute preferences: [Player][MuteType] = MuteTarget
+    public Dictionary<CCSPlayerController, Dictionary<MuteType, MuteTarget>> PlayerMutePreferences = new();
+    
+    // Legacy: MVP Music is not targetable
     public List<CCSPlayerController> MVPMusicMuters = new();
     
+    public bool HasMuteEnabled(CCSPlayerController player, MuteType muteType)
+    {
+        return PlayerMutePreferences.ContainsKey(player) && PlayerMutePreferences[player].ContainsKey(muteType);
+    }
+    public MuteTarget? GetMuteTarget(CCSPlayerController player, MuteType muteType)
+    {
+        if (HasMuteEnabled(player, muteType))
+            return PlayerMutePreferences[player][muteType];
+        return null;
+    }
+    public void SetMutePreference(CCSPlayerController player, MuteType muteType, MuteTarget target)
+    {
+        if (!PlayerMutePreferences.ContainsKey(player))
+            PlayerMutePreferences[player] = new Dictionary<MuteType, MuteTarget>();
+        PlayerMutePreferences[player][muteType] = target;
+    }
+    public void RemoveMutePreference(CCSPlayerController player, MuteType muteType)
+    {
+        if (PlayerMutePreferences.ContainsKey(player))
+        {
+            PlayerMutePreferences[player].Remove(muteType);
+            if (PlayerMutePreferences[player].Count == 0)
+                PlayerMutePreferences.Remove(player);
+        }
+    }
+    public bool ShouldMuteSound(CCSPlayerController listener, CBaseEntity? soundSource, MuteTarget target)
+    {
+        // If we can't determine teams, don't mute (except for Everyone)
+        if (soundSource?.TeamNum == null || listener?.TeamNum == null)
+            return target == MuteTarget.Everyone;
+        
+        switch (target)
+        {
+            case MuteTarget.Everyone:
+                return true;
+            case MuteTarget.Team:
+                return soundSource.TeamNum == listener.TeamNum;
+            case MuteTarget.Enemy:
+                return soundSource.TeamNum != listener.TeamNum;
+            default:
+                return false;
+        }
+    }
+
     public void HookMuteSounds()
     {
         HookUserMessage(208, um =>
@@ -30,30 +77,44 @@ public partial class MuteSounds
 
             if (Footsteps.SoundEventActions.Contains(soundevent))
             {
-                foreach (var p in FootstepSoundMuters.ToList())
+                foreach (var kvp in PlayerMutePreferences.ToList())
                 {
+                    var p = kvp.Key;
                     if (p == null || !p.IsValid || p.Connected != PlayerConnectedState.PlayerConnected)
                     {
                         if (p != null)
-                            FootstepSoundMuters.Remove(p);
+                            PlayerMutePreferences.Remove(p);
                         continue;
                     }
-                    um.Recipients.Remove(p);
+                    
+                    if (!kvp.Value.ContainsKey(MuteType.Footsteps))
+                        continue;
+                    
+                    var target = kvp.Value[MuteType.Footsteps];
+                    if (ShouldMuteSound(p, entity, target))
+                        um.Recipients.Remove(p);
                 }
                 return HookResult.Continue;
             }
 
             if (PlayerHurt.SoundEventActions.Contains(soundevent))
             {
-                foreach (var p in KnifeSoundMuters.ToList())
+                foreach (var kvp in PlayerMutePreferences.ToList())
                 {
+                    var p = kvp.Key;
                     if (p == null || !p.IsValid || p.Connected != PlayerConnectedState.PlayerConnected)
                     {
                         if (p != null)
-                            KnifeSoundMuters.Remove(p);
+                            PlayerMutePreferences.Remove(p);
                         continue;
                     }
-                    um.Recipients.Remove(p);
+                    
+                    if (!kvp.Value.ContainsKey(MuteType.PlayerSounds))
+                        continue;
+                    
+                    var target = kvp.Value[MuteType.PlayerSounds];
+                    if (ShouldMuteSound(p, entity, target))
+                        um.Recipients.Remove(p);
                 }
                 return HookResult.Continue;
             }
@@ -67,20 +128,34 @@ public partial class MuteSounds
             if (um.Recipients == null || um.Recipients.Count == 0)
                 return HookResult.Continue;
 
-            foreach (var p in GunSoundMuters.ToList())
+            uint entityHandle = um.ReadUInt("player");
+            uint pawnIndex = entityHandle & (Utilities.MaxEdicts - 1);
+            var player = Utilities.GetEntityFromIndex<CCSPlayerController>((int)pawnIndex);
+
+            if (player == null)
+                return HookResult.Continue;
+
+            foreach (var kvp in PlayerMutePreferences.ToList())
             {
+                var p = kvp.Key;
                 if (p == null || !p.IsValid || p.Connected != PlayerConnectedState.PlayerConnected)
                 {
                     if (p != null)
-                        GunSoundMuters.Remove(p);
+                        PlayerMutePreferences.Remove(p);
                     continue;
                 }
-                um.Recipients.Remove(p);
+                
+                if (!kvp.Value.ContainsKey(MuteType.GunSounds))
+                    continue;
+                
+                var target = kvp.Value[MuteType.GunSounds];
+                if (ShouldMuteSound(p, player, target))
+                    um.Recipients.Remove(p);
             }
             return HookResult.Continue;
 
         }, HookMode.Pre);
-        
+
         RegisterEventHandler<EventRoundMvp>(OnEventRoundMvp);
     }
 
@@ -91,7 +166,6 @@ public partial class MuteSounds
         var player = @event.Userid;
         if (player == null || !player.IsValid) return HookResult.Continue;
 
-        // If there are players who want to mute MVP music, emit stop sound to them
         if (MVPMusicMuters.Count > 0)
         {
             EmitSoundToPlayers("StopSoundEvents.StopAllMusic", MVPMusicMuters);

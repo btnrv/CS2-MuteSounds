@@ -8,7 +8,7 @@ namespace MuteSounds;
 public partial class MuteSounds : BasePlugin, IPluginConfig<MuteSoundsConfig>
 {
     public override string ModuleName => "MuteSounds";
-    public override string ModuleVersion => "1.0.4";
+    public override string ModuleVersion => "1.0.6";
     public override string ModuleAuthor => "connect rebornjb.com.tr";
 
     public MuteSoundsConfig Config { get ; set; } = new();

@@ -14,10 +14,8 @@ A CounterStrikeSharp plugin for CS2 that allows muting various game sounds.
 - Mute footsteps
 - Mute knife sounds
 - Mute gun sounds
-- Mute player hurt sounds
 - Mute MVP music
 - Target-based filtering (Everyone/Teammates/Enemies)
-- Menu based controls
 
 *Supported languages: TR, EN*
 
